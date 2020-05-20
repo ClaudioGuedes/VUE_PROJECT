@@ -1,24 +1,72 @@
 {
+  "professores": [
+    {
+      "id": 1,
+      "nome": "Rapuano",
+      "sobrenome": "Silva"
+    },
+    {
+      "id": 2,
+      "nome": "Suely",
+      "sobrenome": "Febash"
+    },
+    {
+      "nome": "Margarida",
+      "sobrenome": "",
+      "id": 3
+    }
+  ],
   "alunos": [
     {
       "id": 1,
-      "nome": "Claudio",
-      "sobrenome": "Guedes"
+      "nome": "Claudio André",
+      "sobrenome": "Guedes",
+      "professor": {
+        "id": 1,
+        "nome": "Rapuano",
+        "sobrenome": "Silva"
+      }
     },
     {
       "id": 2,
       "nome": "Eupidio",
-      "sobrenome": "Napoleão"
+      "sobrenome": "Napoleão",
+      "professor": {
+        "id": 1,
+        "nome": "Rapuano",
+        "sobrenome": "Silva"
+      }
     },
     {
+      "id": 4,
       "nome": "Fábio",
-      "sobrenome": "",
-      "id": 4
+      "sobrenome": "Fernandes",
+      "dtnascimento": "10/10/2001",
+      "professor": {
+        "id": 2,
+        "nome": "Suely",
+        "sobrenome": "Febash"
+      }
     },
     {
       "nome": "Thiago",
       "sobrenome": "",
-      "id": 5
+      "id": 5,
+      "professor": {
+        "id": 2,
+        "nome": "Suely",
+        "sobrenome": "Febash"
+      }
+    },
+    {
+      "nome": "Marlon",
+      "sobrenome": "",
+      "professor": {
+        "id": 3,
+        "nome": "Margarida",
+        "sobrenome": ""
+      },
+      "id": 6
     }
   ]
 }
