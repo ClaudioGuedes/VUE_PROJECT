@@ -44,12 +44,12 @@ namespace prj_core_api.Controllers
       }
     }
 
-    [HttpGet("ByProfessor/{ProgessorId}")]
-    public async Task<IActionResult> GetAlunosByProfessorId(int ProfessorId)
+    [HttpGet("ByProfessor/{professorId}")]
+    public async Task<IActionResult> GetAlunosByProfessorId(int professorId)
     {
       try
       {
-        var resultado = await _repository.GetAllAlunosByProfessorId(ProfessorId, true);
+        var resultado = await _repository.GetAllAlunosByProfessorId(professorId, true);
         return Ok(resultado);
       }
       catch (System.Exception)
@@ -76,7 +76,7 @@ namespace prj_core_api.Controllers
       return BadRequest();
     }
 
-    [HttpPut("{Id}")]
+    [HttpPut("{alunoId}")]
     public async Task<IActionResult> Put(int AlunoId, Aluno model)
     {
       try
@@ -100,7 +100,7 @@ namespace prj_core_api.Controllers
       }
     }
 
-    [HttpDelete("{AlunoId}")]
+    [HttpDelete("{alunoId}")]
     public async Task<IActionResult> Delete(int AlunoId)
     {
       try

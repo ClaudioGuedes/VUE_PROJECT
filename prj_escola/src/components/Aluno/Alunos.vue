@@ -1,7 +1,7 @@
 <template>
   <div>
-    <Titulo :txtTitulo="this.professorid != undefined ? 'Professor: ' + this.professor.nome : 'Todos os Alunos'" :btnVoltarVisivel="false"/>
-    <div v-if="this.professorid != undefined">
+    <Titulo :txtTitulo="this.professorId != undefined ? 'Professor: ' + this.professor.nome : 'Todos os Alunos'" :btnVoltarVisivel="false"/>
+    <div v-if="this.professorId != undefined">
       <input type="text" placeholder="Nome do Aluno" v-model="nome" 
       @keyup.enter="adicionarAluno()">
       <button class="btn btnInput" @click="adicionarAluno()">Adicionar</button>
@@ -15,8 +15,8 @@
       </thead>
       <tbody v-if="alunos.length">
         <tr v-for="(aluno, index) in alunos" :key="index">
-          <td>{{aluno.id}}</td>
-          <router-link :to="`/alunodetalhe/${aluno.id}`" tag="td" style="cursor: pointer" >
+          <td>{{aluno.alunoId}}</td>
+          <router-link :to="`/alunodetalhe/${aluno.alunoId}`" tag="td" style="cursor: pointer" >
             {{aluno.nome}} {{aluno.sobrenome}}
           </router-link>
           <td>
@@ -25,7 +25,11 @@
         </tr>
       </tbody>
       <tfoot v-if="alunos.length == 0">
-          Não há nenhum aluno
+        <tr>
+          <td colspan="4" style="text-align: center">
+            <h5>Não há nenhum aluno</h5>
+          </td>
+        </tr>
       </tfoot>      
     </table>
   </div>
@@ -41,7 +45,7 @@ export default {
     return {
       titulo: 'Aluno',
       professor: {},
-      professorid: this.$route.params.profid,
+      professorId: this.$route.params.profid,
       nome: '',
       alunos: []
     }
@@ -49,16 +53,20 @@ export default {
 
   created() {
     var url = '';
-    if (this.professorid) {
-      this.carregarProfessor()
-      url = `http://localhost:3000/alunos?professor.id=${this.professorid}`;
+    if (this.professorId) {
+      url = `http://localhost:5000/api/aluno/ByProfessor/${this.professorId}`;
+    this.$http
+      .get(url)
+      .then(res => res.json())
+      .then((alunos => this.alunos = alunos))
+      .then(() => {this.carregarProfessor()});      
     } else {
-     url = 'http://localhost:3000/alunos';
-    }
+     url = 'http://localhost:5000/api/aluno';
     this.$http
       .get(url)
       .then(res => res.json())
       .then((alunos => this.alunos = alunos));     
+    }
   },
 
   props: {
@@ -70,14 +78,14 @@ export default {
         nome: this.nome,
         sobrenome: '',
         professor: {
-          id: this.professor.id,
+          id: this.professor.professorId,
           nome: this.professor.nome,
           sobrenome: this.professor.sobrenome
         }
       }
 
       this.$http
-        .post('http://localhost:3000/alunos', _aluno)
+        .post('http://localhost:5000/api/aluno', _aluno)
         .then(res => res.json())
         .then(retornoAuno => {
           this.alunos.push(retornoAuno);
@@ -86,7 +94,7 @@ export default {
     },
     removerAluno(aluno){
       this.$http
-        .delete(`http://localhost:3000/alunos/${aluno.id}`)
+        .delete(`http://localhost:5000/api/aluno/${aluno.id}`)
         .then(() => {
           let indice = this.alunos.indexOf(aluno);
           this.alunos.splice(indice, 1);
@@ -94,7 +102,7 @@ export default {
     },
     carregarProfessor() {
       this.$http
-        .get(`http://localhost:3000/professores/${this.professorid}`)
+        .get(`http://localhost:5000/api/professor/${this.professorId}`)
         .then(res => res.json())
         .then((professor => this.professor= professor)
         );

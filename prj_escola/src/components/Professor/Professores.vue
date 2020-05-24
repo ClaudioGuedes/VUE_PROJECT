@@ -16,12 +16,12 @@
       </thead>
       <tbody v-if="professores.length">
         <tr v-for="(professor, index) in professores" :key="index">
-          <td>{{professor.id}}</td>
-          <router-link :to="`/alunos/${professor.id}`" tag="td" style="cursor: pointer">
+          <td>{{professor.professorId}}</td>
+          <router-link :to="`/alunos/${professor.professorId}`" tag="td" style="cursor: pointer">
             {{professor.nome}}
           </router-link>
           <td>
-            {{professor.qtdealunos}}
+            {{professor.qtdeAlunos}}
           </td>
           <td>
             <button class="btn" @click="removerProfessor(professor)">Remover</button>
@@ -29,7 +29,11 @@
         </tr>
       </tbody>
       <tfoot v-if="professores.length == 0">
-          Não há nenhum professor
+        <tr>
+          <td colspan="4" style="text-align: center">
+            <h5>Não há nenhum professor</h5>
+          </td>
+        </tr>
       </tfoot>      
     </table>
   </div>
@@ -52,7 +56,7 @@ export default {
 
   created() {
     this.$http
-      .get('http://localhost:3000/alunos')
+      .get('http://localhost:5000/api/aluno')
       .then(res => res.json())
       .then(
         (
@@ -72,23 +76,22 @@ export default {
     adicionarProfessor() {
       let _professor = {
         nome: this.nome,
-        sobrenome: '',
-        qtdealunos: 0
       }
 
       this.$http
-        .post('http://localhost:3000/professores', _professor)
+        .post('http://localhost:5000/api/professor', _professor)
         .then(res => res.json())
         .then(retornoProfessor => {
+          retornoProfessor.qtdeAlunos = 0;
           this.professores.push(retornoProfessor);
           this.nome = '';
-          this.qtdealunos = 0;
+          this.qtdeAlunos = 0;
         });
     },
 
     removerProfessor(professor){
       this.$http
-        .delete(`http://localhost:3000/professores/${professor.id}`)
+        .delete(`http://localhost:5000/api/professor/${professor.professorId}`)
         .then(() => {
           let indice = this.professores.indexOf(professor);
           this.professores.splice(indice, 1);
@@ -98,10 +101,10 @@ export default {
     quantificarAlunos() {
       this.professores.forEach((professor, index) => {
         professor = {
-          id: professor.id,
+          professorId: professor.professorId,
           nome: professor.nome,
-          qtdealunos: this.alunos.filter(
-            aluno => aluno.professor.id == professor.id
+          qtdeAlunos: this.alunos.filter(
+            aluno => aluno.professor.professorId == professor.professorId
           ).length
         }
         this.professores[index] = professor;
@@ -110,14 +113,14 @@ export default {
 
     carregarAlunos() {
       this.$http
-        .get('http://localhost:3000/alunos')
+        .get('http://localhost:5000/api/aluno')
         .then(res => res.json())
         .then((alunos => this.alunos = alunos));
     },
 
     carregarProfessores() {
       this.$http
-        .get('http://localhost:3000/professores')
+        .get('http://localhost:5000/api/professor')
         .then(res => res.json())
         .then(
           (

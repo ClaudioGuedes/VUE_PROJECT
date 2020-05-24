@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="!carregando">
     <div>
       <Titulo :txtTitulo="`Aluno: ${aluno.nome}`" :btnVoltarVisivel="!this.visualizacao">
         <button v-show="this.visualizacao" class="btn btnEditar" @click="editar()">Editar</button>
@@ -10,7 +10,7 @@
         <tr>
           <td class="colPequeno">Matrícula:</td>
           <td>
-            <label>{{aluno.id}}</label>
+            <label>{{aluno.alunoId}}</label>
           </td>
         </tr>
         <tr>
@@ -30,17 +30,17 @@
         <tr>
           <td class="colPequeno">Data Nascimento:</td>
           <td>
-            <label v-if="visualizacao" >{{aluno.dtnascimento}}</label>
-            <input v-else v-model="aluno.dtnascimento" type="text" />
+            <label v-if="visualizacao" >{{aluno.dtNascimento}}</label>
+            <input v-else v-model="aluno.dtNascimento" type="text" />
           </td>
         </tr>
         <tr>
           <td class="colPequeno">Professor:</td>
           <td>
             <label v-if="visualizacao" >{{aluno.professor.nome}}</label>
-            <select v-else v-model="aluno.professor">
-              <option v-for="(item, index) in this.professores" 
-                :key="index" v-bind:value="item">
+            <select v-else v-model="aluno.professor.professorId">
+              <option v-for="(item, index) in professores" 
+                :key="index" :value="item.professorId">
                 {{item.nome}}
               </option>
             </select>
@@ -51,7 +51,7 @@
 
     <div style="margin-top: 10px">
       <div v-if="!this.visualizacao">
-        <button class="btn btnSalvar" @click="salvar()">
+        <button class="btn btnSalvar" @click="salvar(aluno)">
           Salvar
         </button>
         <button class="btn btnCancelar" @click="cancelar()">
@@ -73,37 +73,52 @@
         aluno: {},
         professores: [],
         idParametro: this.$route.params.id,
-        visualizacao: true
+        visualizacao: true,
+        carregando: true
       }
     },
     created() {
-      var url = `http://localhost:3000/alunos/${this.idParametro}`;
-      this.$http
-        .get(url)
-        .then(res => res.json())
-        .then((retorno => this.aluno = retorno));
-
-      this.$http
-        .get(`http://localhost:3000/professores`)
-        .then(res => res.json())
-        .then((retorno => this.professores = retorno)
-        );
+      this.carregarProfessor();
     }, 
     methods: {
+      carregarAluno(){
+        var url = `http://localhost:5000/api/aluno/${this.idParametro}`;
+        this.$http
+          .get(url)
+          .then(res => res.json())
+          .then(retorno => {
+            this.aluno = retorno;
+            this.carregando = false;            
+          });
+        },
+      carregarProfessor(){
+        var url = `http://localhost:5000/api/professor`;
+        this.$http
+          .get(url)
+          .then(res => res.json())
+          .then(retorno => {
+            this.professores = retorno;
+            this.carregarAluno();
+          });
+      },
       editar() {
         this.visualizacao = !this.visualizacao;
       },
-      salvar() {
-        let _aluno = {
-          id: this.aluno.id,
-          nome: this.aluno.nome,
-          sobrenome: this.aluno.sobrenome,
-          dtnascimento: this.aluno.dtnascimento,
-          professor: this.aluno.professor
+      salvar(_aluno) {
+        let _alunoAlterado = {
+          alunoId: _aluno.alunoId,
+          nome: _aluno.nome,
+          sobrenome: _aluno.sobrenome,
+          dtnascimento: _aluno.dtNascimento,
+          professorId: _aluno.professor.professorId
         };
+        var url = `http://localhost:5000/api/aluno/${_alunoAlterado.alunoId}`;
+        console.log(_alunoAlterado);
         this.$http
-          .put(`http://localhost:3000/alunos/${this.aluno.id}`, _aluno);
-        this.visualizacao = !this.visualizacao;
+          .put(url, _alunoAlterado).then(resp => resp.json()
+          ).then(alunoResp => this.aluno = alunoResp)
+          .then(() => this.visualizacao = true);
+        //this.visualizacao = !this.visualizacao;
       },
       cancelar() {
         this.visualizacao = !this.visualizacao;
